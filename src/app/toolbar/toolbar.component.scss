@@ -1,0 +1,14 @@
+.toolbar {
+  border: 1px solid #eeeeee;
+
+  .tools-list {
+    align-items: center;
+    display: flex;
+    margin: 0;
+    padding: 0;
+
+    .tool-item {
+      list-style-type: none;
+    }
+  }
+}
