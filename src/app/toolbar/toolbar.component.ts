@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 export enum ToolsEnum {
+  cursor = 'cursor',
   image = 'image',
   pen = 'pen',
   brush = 'brush',
@@ -11,7 +12,8 @@ export enum ToolsEnum {
   zoomIn = 'zoomIn',
   zoomOut = 'zoomOut',
   grid = 'grid',
-  lining = 'lining'
+  lining = 'lining',
+  text = 'text',
 }
 
 export enum typeToolEnum {
@@ -31,9 +33,19 @@ export interface IToolbar {
   styleUrls: ['./toolbar.component.scss']
 })
 export class ToolbarComponent implements OnInit {
+  public activeTool: ToolsEnum = ToolsEnum.cursor;
+
   public toolbar: IToolbar[] = [
     {
+      name: ToolsEnum.cursor,
+      type: typeToolEnum.single
+    },
+    {
       name: ToolsEnum.image,
+      type: typeToolEnum.single
+    },
+    {
+      name: ToolsEnum.text,
       type: typeToolEnum.single
     },
     {
@@ -83,4 +95,8 @@ export class ToolbarComponent implements OnInit {
   ngOnInit(): void {
   }
 
+
+  public onSelectedTool(toolItem: IToolbar) {
+    this.activeTool = toolItem.name;
+  }
 }

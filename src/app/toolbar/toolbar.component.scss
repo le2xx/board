@@ -1,5 +1,7 @@
 .toolbar {
-  border: 1px solid #eeeeee;
+  border: 2px solid #c99e10;
+  border-radius: 3px;
+  width: fit-content;
 
   .tools-list {
     align-items: center;
@@ -9,6 +11,33 @@
 
     .tool-item {
       list-style-type: none;
+      padding: 3px 3px;
+
+      .tool-action {
+        align-items: center;
+        background: #FFFFFF;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        height: 40px;
+        justify-content: center;
+        transition: all 200ms;
+        width: 40px;
+
+        .action-icon {
+          fill: #1e434c;
+          height: 30px;
+          width: 30px;
+        }
+
+        &.active {
+          background: #9b4f0f;
+
+          .action-icon {
+            fill: #c99e10;
+          }
+        }
+      }
     }
   }
 }
