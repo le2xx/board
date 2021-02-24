@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ObjectsBoardService } from '../objects-board.service';
+import { Subscription } from 'rxjs';
 
-export enum ToolsEnum {
+export enum CommandToolsEnum {
   cursor = 'cursor',
   image = 'image',
   pen = 'pen',
@@ -22,7 +24,7 @@ export enum typeToolEnum {
 }
 
 export interface IToolbar {
-  name: ToolsEnum;
+  name: CommandToolsEnum;
   type: typeToolEnum;
   label?: string;
 }
@@ -30,73 +32,86 @@ export interface IToolbar {
 @Component({
   selector: 'app-toolbar',
   templateUrl: './toolbar.component.html',
-  styleUrls: ['./toolbar.component.scss']
+  styleUrls: ['./toolbar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ToolbarComponent implements OnInit {
-  public activeTool: ToolsEnum = ToolsEnum.cursor;
-
+export class ToolbarComponent implements OnInit, OnDestroy {
+  public activeTool: CommandToolsEnum = CommandToolsEnum.cursor;
   public toolbar: IToolbar[] = [
     {
-      name: ToolsEnum.cursor,
+      name: CommandToolsEnum.cursor,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.image,
+      name: CommandToolsEnum.image,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.text,
+      name: CommandToolsEnum.text,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.pen,
+      name: CommandToolsEnum.pen,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.brush,
+      name: CommandToolsEnum.brush,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.circle,
+      name: CommandToolsEnum.circle,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.rect,
+      name: CommandToolsEnum.rect,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.undo,
+      name: CommandToolsEnum.undo,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.redo,
+      name: CommandToolsEnum.redo,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.zoomIn,
+      name: CommandToolsEnum.zoomIn,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.zoomOut,
+      name: CommandToolsEnum.zoomOut,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.grid,
+      name: CommandToolsEnum.grid,
       type: typeToolEnum.single
     },
     {
-      name: ToolsEnum.lining,
+      name: CommandToolsEnum.lining,
       type: typeToolEnum.single
     },
   ];
 
-  constructor() { }
+  private subscription = new Subscription();
+
+  constructor(
+    private objectsBoardService: ObjectsBoardService
+  ) {
+  }
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.objectsBoardService.currentTool$
+        .subscribe((tool) => this.activeTool = tool)
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
 
   public onSelectedTool(toolItem: IToolbar) {
-    this.activeTool = toolItem.name;
+    this.objectsBoardService.selectTool(toolItem.name);
   }
 }
