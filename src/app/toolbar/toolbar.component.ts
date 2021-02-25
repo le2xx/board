@@ -16,6 +16,7 @@ export enum CommandToolsEnum {
   grid = 'grid',
   lining = 'lining',
   text = 'text',
+  remove = 'remove'
 }
 
 export enum typeToolEnum {
@@ -56,6 +57,10 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     },
     {
       name: CommandToolsEnum.brush,
+      type: typeToolEnum.single
+    },
+    {
+      name: CommandToolsEnum.remove,
       type: typeToolEnum.single
     },
     {

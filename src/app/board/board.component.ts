@@ -147,8 +147,10 @@ export class BoardComponent implements AfterViewInit {
       this.options.endX = e.pointer.x;
       this.options.endY = e.pointer.y;
       if (!this.command()) {
+        this.objectsBoardService.selectTool(CommandToolsEnum.cursor);
         return;
       }
+
       this.canvas.add(this.command());
       this.objectsBoardService.selectTool(CommandToolsEnum.cursor);
     });
@@ -156,6 +158,11 @@ export class BoardComponent implements AfterViewInit {
 
   private optionsInit(): void {
     this.options.color = colorList[Math.floor(Math.random() * colorList.length)];
+  }
+
+  private removeObject(): void {
+    const activeObject = this.canvas.getActiveObject();
+    this.canvas.remove(activeObject);
   }
 
   private command(): any {
@@ -166,6 +173,8 @@ export class BoardComponent implements AfterViewInit {
         return BoardComponent.drawCircle(this.options);
       case CommandToolsEnum.text:
         return BoardComponent.drawText(this.options);
+      case CommandToolsEnum.remove:
+        return this.removeObject();
       default:
         return;
     }
