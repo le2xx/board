@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ObjectsBoardService } from '../objects-board.service';
 import { Subscription } from 'rxjs';
 
@@ -95,14 +95,18 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   private subscription = new Subscription();
 
   constructor(
-    private objectsBoardService: ObjectsBoardService
+    private objectsBoardService: ObjectsBoardService,
+    private cdr: ChangeDetectorRef
   ) {
   }
 
   ngOnInit(): void {
     this.subscription.add(
       this.objectsBoardService.currentTool$
-        .subscribe((tool) => this.activeTool = tool)
+        .subscribe((tool) => {
+          this.activeTool = tool;
+          this.cdr.detectChanges();
+        })
     );
   }
 
