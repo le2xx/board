@@ -1,6 +1,6 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { fabric } from 'fabric';
-import { Circle, ICircleOptions, IObjectOptions, Rect } from 'fabric/fabric-impl';
+import { Circle, ICircleOptions, IRectOptions, IText, ITextOptions, Rect } from 'fabric/fabric-impl';
 import { Subscription } from 'rxjs';
 import { ObjectsBoardService } from '../objects-board.service';
 import { CommandToolsEnum } from '../toolbar/toolbar.component';
@@ -44,6 +44,18 @@ const colorList = [
   '#999999'
 ];
 
+interface IOptions {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  color: string;
+  strokeWidth: number;
+  fontSize: number;
+  fontFamily: string;
+  fontWeight: string;
+}
+
 @Component({
   selector: 'app-board',
   templateUrl: './board.component.html',
@@ -56,27 +68,56 @@ export class BoardComponent implements AfterViewInit {
   ) {
   }
   private canvas: any;
-  private options: IObjectOptions | ICircleOptions = {
-    top: 0,
-    left: 0,
-    height: 0,
-    width: 0,
-    radius: 0,
-    stroke: '#6633FF',
+  private options: IOptions = {
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 0,
+    color: '#999999',
     strokeWidth: 3,
-    fill: '#6633FF'
+    fontSize: 26,
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: 'normal',
   };
   private subscription = new Subscription();
   private activeTool: CommandToolsEnum = CommandToolsEnum.cursor;
 
-  private static drawRectangle(option: IObjectOptions): Rect {
-    return new fabric.Rect(option);
+  private static drawRectangle(options: IOptions): Rect {
+    const rectOptions: IRectOptions = {
+      left: options.startX,
+      top: options.startY,
+      height: options.endY - options.startY,
+      width: options.endX - options.startX,
+      fill: options.color + 'c8',
+      stroke: options.color,
+      strokeWidth: options.strokeWidth,
+    };
+    return new fabric.Rect(rectOptions);
   }
 
-  private static drawCircle(options: IObjectOptions): Circle {
-    // @ts-ignore
-    const radius = options.width / 2;
-    return new fabric.Circle({ ...options, radius });
+  private static drawCircle(options: IOptions): Circle {
+    const circleOptions: ICircleOptions = {
+      left: options.startX,
+      top: options.startY,
+      radius: options.endX - options.startX < options.endY - options.startY ?
+        (options.endX - options.startX) / 2 : (options.endY - options.startY) / 3,
+      fill: options.color + 'c8',
+      stroke: options.color,
+      strokeWidth: options.strokeWidth,
+    };
+    return new fabric.Circle(circleOptions);
+  }
+
+  private static drawText(options: IOptions): IText {
+    const textOptions: ITextOptions = {
+      left: options.startX,
+      top: options.startY,
+      fontSize: options.fontSize,
+      fontFamily: options.fontFamily,
+      fontWeight: options.fontWeight,
+      fill: options.color,
+    };
+    return new fabric.IText('Input text', textOptions);
   }
 
   ngAfterViewInit(): void {
@@ -93,8 +134,8 @@ export class BoardComponent implements AfterViewInit {
   private eventsInit(): void {
     this.canvas.on('mouse:down', (e: any) => {
       console.log('BoardComponent::mouse:down', e);
-      this.options.top = e.pointer.y;
-      this.options.left = e.pointer.x;
+      this.options.startX = e.pointer.x;
+      this.options.startY = e.pointer.y;
     });
 
     this.canvas.on('mouse:move', (e: any) => {
@@ -103,22 +144,18 @@ export class BoardComponent implements AfterViewInit {
 
     this.canvas.on('mouse:up', (e: any) => {
       console.log('BoardComponent::mouse:up', e);
+      this.options.endX = e.pointer.x;
+      this.options.endY = e.pointer.y;
       if (!this.command()) {
         return;
       }
-      console.log(this.options);
-      // @ts-ignore
-      this.options.height = e.pointer.y - this.options.top;
-      // @ts-ignore
-      this.options.width = e.pointer.x - this.options.left;
-      // this.options.radius = this.options.width / 2;
       this.canvas.add(this.command());
+      this.objectsBoardService.selectTool(CommandToolsEnum.cursor);
     });
   }
 
   private optionsInit(): void {
-    this.options.stroke = colorList[Math.floor(Math.random() * colorList.length)];
-    this.options.fill = this.options.stroke + 'c8';
+    this.options.color = colorList[Math.floor(Math.random() * colorList.length)];
   }
 
   private command(): any {
@@ -127,6 +164,8 @@ export class BoardComponent implements AfterViewInit {
         return BoardComponent.drawRectangle(this.options);
       case CommandToolsEnum.circle:
         return BoardComponent.drawCircle(this.options);
+      case CommandToolsEnum.text:
+        return BoardComponent.drawText(this.options);
       default:
         return;
     }
@@ -135,16 +174,6 @@ export class BoardComponent implements AfterViewInit {
 
 // this.canvas
 // this.canvas.add(new fabric.IText('Hello Fabric!'));
-// this.canvas.add(new fabric.Circle(
-//   {
-//     left: 200,
-//     top: 100,
-//     radius: 50,
-//     fill: 'rgba(255, 0, 0, .7)',
-//     stroke: 'green',
-//     strokeWidth: 2,
-//   })
-// );
 // this.canvas.add(new fabric.Line([100, 100, 100, 200],
 //   {
 //     strokeWidth: 2,
@@ -160,17 +189,6 @@ export class BoardComponent implements AfterViewInit {
 //     fill: 'rgba(255, 0, 0, .7)',
 //     left: 150,
 //     top: 100
-//   })
-// );
-// this.canvas.add(new fabric.Rect(
-//   {
-//     width: 100,
-//     height: 100,
-//     top: 200,
-//     left: 200,
-//     stroke: 'yellow',
-//     strokeWidth: 6,
-//     fill: 'rgba(255, 0, 0, .7)',
 //   })
 // );
 // this.canvas.add(new fabric.Polyline(
