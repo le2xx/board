@@ -1,6 +1,6 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { fabric } from 'fabric';
-import { Circle, ICircleOptions, IRectOptions, IText, ITextOptions, Rect } from 'fabric/fabric-impl';
+import {Circle, ICircleOptions, IRectOptions, IText, ITextOptions, Rect, Triangle} from 'fabric/fabric-impl';
 import { Subscription } from 'rxjs';
 import { ObjectsBoardService } from '../objects-board.service';
 import { CommandToolsEnum } from '../toolbar/toolbar.component';
@@ -81,6 +81,19 @@ export class BoardComponent implements AfterViewInit {
   };
   private subscription = new Subscription();
   private activeTool: CommandToolsEnum = CommandToolsEnum.cursor;
+
+  public static drawTriangle(options: IOptions): Triangle {
+    const triangleOptions = {
+      left: options.startX,
+      top: options.startY,
+      height: options.endY - options.startY,
+      width: options.endX - options.startX,
+      fill: options.color + 'c8',
+      stroke: options.color,
+      strokeWidth: options.strokeWidth,
+    };
+    return new fabric.Triangle(triangleOptions);
+  }
 
   private static drawRectangle(options: IOptions): Rect {
     const rectOptions: IRectOptions = {
@@ -165,8 +178,14 @@ export class BoardComponent implements AfterViewInit {
     this.canvas.remove(activeObject);
   }
 
+  private drawPen() {
+    this.canvas.isDrawingMode = true;
+  }
+
   private command(): any {
     switch (this.activeTool) {
+      case CommandToolsEnum.triangle:
+        return BoardComponent.drawTriangle(this.options);
       case CommandToolsEnum.rect:
         return BoardComponent.drawRectangle(this.options);
       case CommandToolsEnum.circle:
@@ -175,6 +194,8 @@ export class BoardComponent implements AfterViewInit {
         return BoardComponent.drawText(this.options);
       case CommandToolsEnum.remove:
         return this.removeObject();
+      case CommandToolsEnum.pen:
+        return this.drawPen();
       default:
         return;
     }
