@@ -73,4 +73,9 @@
     <path d="M0 0h24v24H0V0z" fill="none"/>
     <path d="M12 7.77L18.39 18H5.61L12 7.77M12 4L2 20h20L12 4z"/>
   </symbol>
+
+  <symbol id="line" viewBox="0 0 24 24">
+    <rect fill="none" height="24" width="24"/>
+    <polygon points="13,3 16.29,6.29 6.29,16.29 3,13 11,21 7.71,17.71 17.71,7.71"/>
+  </symbol>
 </svg>

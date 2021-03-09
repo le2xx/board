@@ -10,6 +10,7 @@ export enum CommandToolsEnum {
   circle = 'circle',
   rect = 'rect',
   triangle = 'triangle',
+  line = 'line',
   undo = 'undo',
   redo = 'redo',
   zoomIn = 'zoomIn',
@@ -74,6 +75,10 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     },
     {
       name: CommandToolsEnum.triangle,
+      type: typeToolEnum.single
+    },
+    {
+      name: CommandToolsEnum.line,
       type: typeToolEnum.single
     },
     {

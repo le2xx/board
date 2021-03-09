@@ -1,6 +1,6 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { fabric } from 'fabric';
-import { Circle, ICircleOptions, IRectOptions, IText, ITextOptions, Rect, Triangle } from 'fabric/fabric-impl';
+import {Circle, ICircleOptions, ILineOptions, IRectOptions, IText, ITextOptions, Line, Rect, Triangle} from 'fabric/fabric-impl';
 import { Subscription } from 'rxjs';
 import { ObjectsBoardService } from '../objects-board.service';
 import { CommandToolsEnum } from '../toolbar/toolbar.component';
@@ -82,6 +82,21 @@ export class BoardComponent implements AfterViewInit {
   };
   private subscription = new Subscription();
   private activeTool: CommandToolsEnum = CommandToolsEnum.cursor;
+
+  public static drawLine(options: IOptions): Line {
+    const points = [
+      options.startX,
+      options.startY,
+      options.endX,
+      options.endY
+    ];
+    const lineOptions: ILineOptions = {
+      fill: options.color + 'c8',
+      stroke: options.color,
+      strokeWidth: options.strokeWidth,
+    };
+    return new fabric.Line(points, lineOptions);
+  }
 
   public static drawTriangle(options: IOptions): Triangle {
     const triangleOptions = {
@@ -216,6 +231,8 @@ export class BoardComponent implements AfterViewInit {
         return BoardComponent.drawRectangle(this.options);
       case CommandToolsEnum.circle:
         return BoardComponent.drawCircle(this.options);
+      case CommandToolsEnum.line:
+        return BoardComponent.drawLine(this.options);
       case CommandToolsEnum.text:
         return BoardComponent.drawText(this.options);
       case CommandToolsEnum.remove:
