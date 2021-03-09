@@ -1,6 +1,6 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { fabric } from 'fabric';
-import {Circle, ICircleOptions, IRectOptions, IText, ITextOptions, Rect, Triangle} from 'fabric/fabric-impl';
+import { Circle, ICircleOptions, IRectOptions, IText, ITextOptions, Rect, Triangle } from 'fabric/fabric-impl';
 import { Subscription } from 'rxjs';
 import { ObjectsBoardService } from '../objects-board.service';
 import { CommandToolsEnum } from '../toolbar/toolbar.component';
@@ -62,6 +62,7 @@ interface IOptions {
   styleUrls: ['./board.component.scss']
 })
 export class BoardComponent implements AfterViewInit {
+  static canvas: any;
 
   constructor(
     private objectsBoardService: ObjectsBoardService
@@ -133,6 +134,20 @@ export class BoardComponent implements AfterViewInit {
     return new fabric.IText('Input text', textOptions);
   }
 
+  private drawPen(): void {
+    this.canvas.isDrawingMode = true;
+    this.canvas.freeDrawingBrush.color = this.options.color;
+    this.canvas.freeDrawingBrush.width = 1;
+    this.canvas.freeDrawingBrush.opacity = 0.7;
+  }
+
+  private drawBrush(): void {
+    this.canvas.isDrawingMode = true;
+    this.canvas.freeDrawingBrush.color = this.options.color;
+    this.canvas.freeDrawingBrush.width = 5;
+    this.canvas.freeDrawingBrush.opacity = 0.7;
+  }
+
   ngAfterViewInit(): void {
     this.canvas = new fabric.Canvas('myCanvas');
     this.optionsInit();
@@ -140,7 +155,23 @@ export class BoardComponent implements AfterViewInit {
 
     this.subscription.add(
       this.objectsBoardService.currentTool$
-        .subscribe((tool) => this.activeTool = tool)
+        .subscribe((tool) => {
+          this.activeTool = tool;
+          switch (tool) {
+            case CommandToolsEnum.pen:
+              this.drawPen();
+              break;
+            case CommandToolsEnum.brush:
+              this.drawBrush();
+              break;
+            case CommandToolsEnum.cursor:
+              this.canvas.isDrawingMode = false;
+              break;
+            default:
+              this.canvas.isDrawingMode = false;
+              return;
+          }
+        })
     );
   }
 
@@ -160,7 +191,6 @@ export class BoardComponent implements AfterViewInit {
       this.options.endX = e.pointer.x;
       this.options.endY = e.pointer.y;
       if (!this.command()) {
-        this.objectsBoardService.selectTool(CommandToolsEnum.cursor);
         return;
       }
 
@@ -178,10 +208,6 @@ export class BoardComponent implements AfterViewInit {
     this.canvas.remove(activeObject);
   }
 
-  private drawPen() {
-    this.canvas.isDrawingMode = true;
-  }
-
   private command(): any {
     switch (this.activeTool) {
       case CommandToolsEnum.triangle:
@@ -194,45 +220,8 @@ export class BoardComponent implements AfterViewInit {
         return BoardComponent.drawText(this.options);
       case CommandToolsEnum.remove:
         return this.removeObject();
-      case CommandToolsEnum.pen:
-        return this.drawPen();
       default:
         return;
     }
   }
 }
-
-// this.canvas
-// this.canvas.add(new fabric.IText('Hello Fabric!'));
-// this.canvas.add(new fabric.Line([100, 100, 100, 200],
-//   {
-//     strokeWidth: 2,
-//     stroke: 'orange',
-//     left: 20,
-//     top: 50
-//   })
-// );
-// this.canvas.add(new fabric.Path('M 0 0 L 200 100 L 180 210 z',
-//   {
-//     strokeWidth: 4,
-//     stroke: 'yellow',
-//     fill: 'rgba(255, 0, 0, .7)',
-//     left: 150,
-//     top: 100
-//   })
-// );
-// this.canvas.add(new fabric.Polyline(
-//   [
-//     {x: 10, y: 10},
-//     {x: 100, y: 60},
-//     {x: 120, y: 90},
-//     {x: 20, y: 60},
-//   ],
-//   {
-//     top: 250,
-//     left: 20,
-//     stroke: 'yellow',
-//     strokeWidth: 6,
-//     fill: 'rgba(255, 255, 255, 0)',
-//   })
-// );
