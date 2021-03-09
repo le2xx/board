@@ -14,6 +14,7 @@ export enum CommandToolsEnum {
   undo = 'undo',
   redo = 'redo',
   zoomIn = 'zoomIn',
+  zoom = 'zoom',
   zoomOut = 'zoomOut',
   grid = 'grid',
   lining = 'lining',
@@ -91,6 +92,10 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     },
     {
       name: CommandToolsEnum.zoomIn,
+      type: typeToolEnum.single
+    },
+    {
+      name: CommandToolsEnum.zoom,
       type: typeToolEnum.single
     },
     {

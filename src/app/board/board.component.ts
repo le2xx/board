@@ -163,6 +163,19 @@ export class BoardComponent implements AfterViewInit {
     this.canvas.freeDrawingBrush.opacity = 0.7;
   }
 
+  private zoomIn(): void {
+    const zoom = this.canvas.getZoom();
+    this.canvas.setZoom(zoom + 0.1);
+  }
+  private zoom(): void {
+    this.canvas.setZoom(1);
+  }
+
+  private zoomOut(): void {
+    const zoom = this.canvas.getZoom();
+    this.canvas.setZoom(zoom - 0.1);
+  }
+
   ngAfterViewInit(): void {
     this.canvas = new fabric.Canvas('myCanvas');
     this.optionsInit();
@@ -181,6 +194,15 @@ export class BoardComponent implements AfterViewInit {
               break;
             case CommandToolsEnum.cursor:
               this.canvas.isDrawingMode = false;
+              break;
+            case CommandToolsEnum.zoomIn:
+              this.zoomIn();
+              break;
+            case CommandToolsEnum.zoom:
+              this.zoom();
+              break;
+            case CommandToolsEnum.zoomOut:
+              this.zoomOut();
               break;
             default:
               this.canvas.isDrawingMode = false;
